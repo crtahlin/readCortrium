@@ -1,0 +1,1 @@
+Package for reading data from cortrium C3 device into R.
