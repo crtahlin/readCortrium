@@ -1,0 +1,11 @@
+Package: readCortrium
+Type: Package
+Title: Package for reading data from cortrium C3 device into R.
+Version: 0.1
+Date: 2014-09-17
+Author: Crt Ahlin
+Maintainer: Crt Ahlin <crt.ahlin@numbersinlife.com>
+Description: Reads data saved by the cortrium C3 device in binary form and
+    imports it into R data frames. Not all data is supported (supported: ECG,
+    temperature).
+License: GPL-3
