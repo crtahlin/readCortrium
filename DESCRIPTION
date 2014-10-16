@@ -9,3 +9,5 @@ Description: Reads data saved by the cortrium C3 device in binary form and
     imports it into R data frames. Not all data is supported (supported: ECG,
     temperature).
 License: GPL-3
+Depends:
+    signal

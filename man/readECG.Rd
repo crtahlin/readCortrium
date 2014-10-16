@@ -3,10 +3,14 @@
 \alias{readECG}
 \title{Read ECG records}
 \usage{
-readECG(dirname)
+readECG(dirname, recordType = "raw")
 }
 \arguments{
 \item{dirname}{The path to the directory containing the ecgX_raw.bin files.}
+
+\item{recordType}{The type of recorded signal to read -
+"raw" (data only high-pass filtered at 0.3Hz) or
+"filtered" (data further low-passs filtered at 40Hz). Defaults to "raw".}
 }
 \description{
 Read the ECG records contained in the ecgX_raw.bin files and
