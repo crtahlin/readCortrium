@@ -2,9 +2,12 @@
 #' 
 #' @description Reads the temp.bin file saved by the cortrium C3 and outputs
 #' a dataframe with columns for body temperature and external temperature.
-#' Sampled at 25 Hz.
+#' Sampled at 25 Hz. 
 #' 
-#' @param dirname The path to the directory containing the temp.bin file.
+#' @details Returns the start of measurement as an attribute measurementStart
+#' 
+#' @param dirname The path to the directory containing the temp.bin file 
+#' (assumes bat_adc.txt is in the same directory).
 #' @export
 readDegrees <- function (dirname) {
   filename <- paste0(dirname,"temp.bin")
@@ -23,8 +26,13 @@ readDegrees <- function (dirname) {
   indicesDegreesBody <- seq(from=2, to=length(degreesAll), by=2)
   degreesBody <- degreesAll[indicesDegreesBody]
   close(con)
+  
+  # add data about start of recording as an attribute
+  results <- data.frame(degressBody=degreesBody, degreesExternal=degreesExternal)
+  attr(results, which="measurementStart") <- getStartofMeasurement(dirname)
+  
   # return data frame with results
-  return(data.frame(degreesBody, degreesExternal))  
+  return(results)  
 }
 
 
@@ -37,7 +45,8 @@ readDegrees <- function (dirname) {
 #' NOTE: This is raw ECG data. Nothing is currently done with values 
 #' greater than 32676 - in the matlab scripts they seem to be set to 0.
 #' 
-#' @param dirname The path to the directory containing the ecgX_raw.bin files.
+#' @param dirname The path to the directory containing the ecgX_raw.bin files 
+#' (assumes bat_adc.txt is in the same directory).
 #' @param recordType The type of recorded signal to read - 
 #' "raw" (data only high-pass filtered at 0.3Hz) or 
 #' "filtered" (data further low-passs filtered at 40Hz). Defaults to "raw".
@@ -71,7 +80,8 @@ readECG <- function (dirname, recordType="raw") {
 #' NOTE: This is raw respiration rate data. It has to be further processed to 
 #' get a sensible respiration rate (local maxima imply a maximum chest expansion?).
 #' 
-#' @param dirname The path to the directory containing the resp_raw.bin files.
+#' @param dirname The path to the directory containing the resp_raw.bin files
+#' (assumes bat_adc.txt is in the same directory).
 #' @export
 readRespiration <- function (dirname) {
   filename <- paste0(dirname,"resp_raw.bin")
@@ -97,7 +107,8 @@ readRespiration <- function (dirname) {
 #' for a quick implementation.
 #' Outputs data frame with columns representing beat times in seconds. 
 #' 
-#' @param dirname The path to the directory containing the ecgX_raw.bin files.
+#' @param dirname The path to the directory containing the ecgX_raw.bin files
+#' (assumes bat_adc.txt is in the same directory).
 #' @export
 beatsFromECG <- function (dirname, cutoffValue=200, highpassFreq=0.3) {
   # read the ECG values
@@ -129,4 +140,47 @@ beatsFromECG <- function (dirname, cutoffValue=200, highpassFreq=0.3) {
   # return a data frame of beat times in seconds
   return(as.data.frame(beatTimes))
   
+}
+
+#' @title Read battery status data
+#' 
+#' @description Read the records about battery status contained in the bat_adc.txt
+#' file and output a data frame with column containing the timestamp,
+#'  ??? and battery status.
+#' 
+#' @param dirname The path to the directory containing the bat_adc.txt files.
+#' 
+#' @export
+readBatteryStatus <- function (dirname) {
+  
+  filename <- paste0(dirname,"bat_adc.txt")
+  # import data and name columns
+  # TODO: what does the 2nd column represent, battery voltage?
+  data <- read.csv2(filename, header=FALSE, col.names=c("timestamp","unknownVar","status"))
+  # make the first column a POSIXct date
+  # assume a default "local" timezone
+  data[,"timestamp"] <- as.POSIXct(data[,"timestamp"], format="%Y-%m-%d %H.%M.%S")
+  
+  # return battery status data
+  return(data)  
+}
+
+
+#' @title Read date and time of the start of measurement
+#' 
+#' @description Uses the function readBatteryStatus() to get data and 
+#' extracts and returns the timestamp of the first entry, assuming this is the
+#'  start of all the measurements.
+#' 
+#'  @param  dirname The path to the directory containing the bat_adc.txt files.
+#'  
+#'  @export
+getStartofMeasurement <- function (dirname) {
+  # get data about battery status
+  data <- readBatteryStatus(dirname)
+  # extract the first timestamp
+  start <- data[1, "timestamp"]
+  
+  # return the timestamp of first measurement
+  return(start)  
 }

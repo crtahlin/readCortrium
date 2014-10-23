@@ -6,7 +6,8 @@
 readRespiration(dirname)
 }
 \arguments{
-\item{dirname}{The path to the directory containing the resp_raw.bin files.}
+\item{dirname}{The path to the directory containing the resp_raw.bin files
+(assumes bat_adc.txt is in the same directory).}
 }
 \description{
 Read the respiration rate records contained in the resp_raw.bin

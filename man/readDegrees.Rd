@@ -6,11 +6,15 @@
 readDegrees(dirname)
 }
 \arguments{
-\item{dirname}{The path to the directory containing the temp.bin file.}
+\item{dirname}{The path to the directory containing the temp.bin file
+(assumes bat_adc.txt is in the same directory).}
 }
 \description{
 Reads the temp.bin file saved by the cortrium C3 and outputs
 a dataframe with columns for body temperature and external temperature.
 Sampled at 25 Hz.
+}
+\details{
+Returns the start of measurement as an attribute measurementStart
 }
 

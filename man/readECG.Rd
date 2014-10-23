@@ -6,7 +6,8 @@
 readECG(dirname, recordType = "raw")
 }
 \arguments{
-\item{dirname}{The path to the directory containing the ecgX_raw.bin files.}
+\item{dirname}{The path to the directory containing the ecgX_raw.bin files
+(assumes bat_adc.txt is in the same directory).}
 
 \item{recordType}{The type of recorded signal to read -
 "raw" (data only high-pass filtered at 0.3Hz) or
