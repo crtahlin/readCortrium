@@ -208,25 +208,16 @@ addTimestamp <- function (dataframe, frequency, start=attr(dataframe, which="mea
   length <- dim(dataframe)[1]
   timestamp <- vector()
   class(timestamp) <- "POSIXct"
-  
-  browser()
-  
-  for (i in 1:length) {
-    timestamp[i] <- start + i %/% frequency
-  }
-  
+ 
   X=(1:length)
-  makeTimestamp <- function(x, frequency) {start + i %/% frequency}
+  # timestamp is the intial timestamp + number of whole seconds
+  makeTimestamp <- function(x, frequency) {start + x %/% frequency}
   values <- vector()
   class(values) <- "POSIXct"
   result <- lapply(X, FUN=makeTimestamp, frequency=frequency)
-  as.POSIXct(head(result))
-unlist(head(as.POSIXct(result)))
-  as.POSIXct(unlist(head(result)), origin="1970-01-01")
-  str(result)
-  
-  addtoDataframe <- function(x) {}
-  lapply(X=result, )
+  # when "unlisted", the POSIXct class gets lost, so here I set it again
+  # surely, there must be a better way?
+  timestamp <- as.POSIXct(unlist(result), origin="1970-01-01")
   
   # return the data frame with added timestamp
   data <- data.frame(dataframe, timestamp=timestamp)
