@@ -28,8 +28,14 @@ readDegrees <- function (dirname) {
   close(con)
   
   # add data about start of recording as an attribute
-  results <- data.frame(degressBody=degreesBody, degreesExternal=degreesExternal)
-  attr(results, which="measurementStart") <- getStartofMeasurement(dirname)
+  results <- data.frame(degreesBody=degreesBody, degreesExternal=degreesExternal)
+  measurementStart <- getStartofMeasurement(dirname)
+  measurementEnd <- measurementStart + (length(degreesAll)/2)/(25) 
+      # two measurements at each occasion, 25 Hz frequency of measurement
+  attr(results, which="measurementStart") <- measurementStart
+  attr(results, which="measurementEnd") <- measurementEnd
+  # calculate end of recording time
+  
   
   # return data frame with results
   return(results)  
@@ -183,4 +189,46 @@ getStartofMeasurement <- function (dirname) {
   
   # return the timestamp of first measurement
   return(start)  
+}
+
+
+#' @title Function that adds a timestamp to a data frame
+#' 
+#' @description Takes a data frame (that has the starting value of measurements as an attribute) 
+#' and sampling frequency as input. Outputs the data frame with additional column containing
+#' timestamps of measurement.
+#' 
+#' @param dataframe The name of the dataframe.
+#' @param frequency The frequency of measurement in Hz. 
+#' @param start The initial timestamp.
+#' 
+#' @export
+addTimestamp <- function (dataframe, frequency, start=attr(dataframe, which="measurementStart")) {
+  
+  length <- dim(dataframe)[1]
+  timestamp <- vector()
+  class(timestamp) <- "POSIXct"
+  
+  browser()
+  
+  for (i in 1:length) {
+    timestamp[i] <- start + i %/% frequency
+  }
+  
+  X=(1:length)
+  makeTimestamp <- function(x, frequency) {start + i %/% frequency}
+  values <- vector()
+  class(values) <- "POSIXct"
+  result <- lapply(X, FUN=makeTimestamp, frequency=frequency)
+  as.POSIXct(head(result))
+unlist(head(as.POSIXct(result)))
+  as.POSIXct(unlist(head(result)), origin="1970-01-01")
+  str(result)
+  
+  addtoDataframe <- function(x) {}
+  lapply(X=result, )
+  
+  # return the data frame with added timestamp
+  data <- data.frame(dataframe, timestamp=timestamp)
+  return(data)  
 }
