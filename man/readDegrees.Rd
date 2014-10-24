@@ -15,6 +15,7 @@ a dataframe with columns for body temperature and external temperature.
 Sampled at 25 Hz.
 }
 \details{
-Returns the start of measurement as an attribute measurementStart
+Returns the start and end of measurement as an attribute measurementStart and
+measurementEnd.
 }
 

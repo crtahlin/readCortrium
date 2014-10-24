@@ -17,6 +17,10 @@ where the next peak is more than 25 values (100ms) away from the previous one
 and assumes this as the start of the next heart beat. Uses the
 ECG1 records. This is a simple method - better ones exist -
 for a quick implementation.
-Outputs data frame with columns representing beat times in seconds.
+Outputs data frame with columns representing beat times in seconds,
+ beat timestamps and momentary heart beat values.
+}
+\details{
+Returns the start of measurement as an attribute measurementStart.
 }
 

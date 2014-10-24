@@ -4,7 +4,8 @@
 #' a dataframe with columns for body temperature and external temperature.
 #' Sampled at 25 Hz. 
 #' 
-#' @details Returns the start of measurement as an attribute measurementStart
+#' @details Returns the start and end of measurement as an attribute measurementStart and 
+#' measurementEnd.
 #' 
 #' @param dirname The path to the directory containing the temp.bin file 
 #' (assumes bat_adc.txt is in the same directory).
@@ -34,8 +35,6 @@ readDegrees <- function (dirname) {
       # two measurements at each occasion, 25 Hz frequency of measurement
   attr(results, which="measurementStart") <- measurementStart
   attr(results, which="measurementEnd") <- measurementEnd
-  # calculate end of recording time
-  
   
   # return data frame with results
   return(results)  
@@ -56,6 +55,10 @@ readDegrees <- function (dirname) {
 #' @param recordType The type of recorded signal to read - 
 #' "raw" (data only high-pass filtered at 0.3Hz) or 
 #' "filtered" (data further low-passs filtered at 40Hz). Defaults to "raw".
+#' 
+#' @details Returns the start and end of measurement as an attribute measurementStart and 
+#' measurementEnd.
+#' 
 #' @export
 readECG <- function (dirname, recordType="raw") {
   # for each ECG lead
@@ -73,8 +76,16 @@ readECG <- function (dirname, recordType="raw") {
     close(con)
   }
   
+  # add data about start of recording as an attribute
+  results <- data.frame(ECG1, ECG2, ECG3)
+  measurementStart <- getStartofMeasurement(dirname)
+  measurementEnd <- measurementStart + (dim(results)[1])/(250) 
+  # 250 Hz frequency of measurement
+  attr(results, which="measurementStart") <- measurementStart
+  attr(results, which="measurementEnd") <- measurementEnd
+    
   # return ECG records
-  return(data.frame(ECG1, ECG2, ECG3))
+  return(results)
   
 }
 
@@ -88,6 +99,10 @@ readECG <- function (dirname, recordType="raw") {
 #' 
 #' @param dirname The path to the directory containing the resp_raw.bin files
 #' (assumes bat_adc.txt is in the same directory).
+#' 
+#' @details Returns the start and end of measurement as an attribute measurementStart and 
+#' measurementEnd.
+#' 
 #' @export
 readRespiration <- function (dirname) {
   filename <- paste0(dirname,"resp_raw.bin")
@@ -98,8 +113,17 @@ readRespiration <- function (dirname) {
   respRate <- readBin(con=con, what=integer(), n=fileSize/2, size=2, signed=TRUE)
   
   close(con)
+  
+  # add data about start of recording as an attribute
+  results <- data.frame(respRate)
+  measurementStart <- getStartofMeasurement(dirname)
+  measurementEnd <- measurementStart + (dim(results)[1])/(250) 
+  # 250 Hz frequency of measurement
+  attr(results, which="measurementStart") <- measurementStart
+  attr(results, which="measurementEnd") <- measurementEnd
+  
   # return respiration rate records
-  return(data.frame(respRate))
+  return(results)
 }
 
 #' @title A simple function to extract heart beat timings from ECG data
@@ -111,10 +135,14 @@ readRespiration <- function (dirname) {
 #' and assumes this as the start of the next heart beat. Uses the
 #' ECG1 records. This is a simple method - better ones exist - 
 #' for a quick implementation.
-#' Outputs data frame with columns representing beat times in seconds. 
+#' Outputs data frame with columns representing beat times in seconds,
+#'  beat timestamps and momentary heart beat values. 
 #' 
 #' @param dirname The path to the directory containing the ecgX_raw.bin files
 #' (assumes bat_adc.txt is in the same directory).
+#' 
+#' @details Returns the start of measurement as an attribute measurementStart.
+#' 
 #' @export
 beatsFromECG <- function (dirname, cutoffValue=200, highpassFreq=0.3) {
   # read the ECG values
@@ -142,9 +170,23 @@ beatsFromECG <- function (dirname, cutoffValue=200, highpassFreq=0.3) {
   
   # calcluate beat times for records marked as new beats
   beatTimes <- highValues[isBeat==TRUE]/250
+  results <- as.data.frame(beatTimes)
   
+  # add data about start of recording as an attribute
+  measurementStart <- getStartofMeasurement(dirname) 
+  attr(results, which="measurementStart") <- measurementStart
+  
+  # add timestamps of each beat time to the data frame
+  results[,"timestamp"] <- measurementStart + results[, "beatTimes"]
+  
+  # add momentary HR column
+  # calculated as inverted difference between times of beats and 
+  # value assigned to time of next beat (perhaps better if assigned
+  # to the middle of the interval?)
+  results[-1,"momentaryHR"] <- 60* (1/diff(results[,"beatTimes"]))
+    
   # return a data frame of beat times in seconds
-  return(as.data.frame(beatTimes))
+  return(results)
   
 }
 

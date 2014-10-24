@@ -16,4 +16,8 @@ file and output them in a data frame. Sampled at 250 Hz.
 NOTE: This is raw respiration rate data. It has to be further processed to
 get a sensible respiration rate (local maxima imply a maximum chest expansion?).
 }
+\details{
+Returns the start and end of measurement as an attribute measurementStart and
+measurementEnd.
+}
 

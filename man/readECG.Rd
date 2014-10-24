@@ -21,4 +21,8 @@ Sampled at 250 Hz.
 NOTE: This is raw ECG data. Nothing is currently done with values
 greater than 32676 - in the matlab scripts they seem to be set to 0.
 }
+\details{
+Returns the start and end of measurement as an attribute measurementStart and
+measurementEnd.
+}
 
