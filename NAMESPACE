@@ -3,6 +3,7 @@
 export(addTimestamp)
 export(beatsFromECG)
 export(getStartofMeasurement)
+export(readAccel)
 export(readBatteryStatus)
 export(readDegrees)
 export(readECG)
